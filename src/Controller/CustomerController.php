@@ -2,43 +2,38 @@
 
 namespace App\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
-use FOS\RestBundle\Controller\FOSRestController;
-use FOS\RestBundle\Controller\Annotations as Rest;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use App\Entity\Customer;
 use App\Form\CustomerType;
+use App\Repository\CustomerRepository;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * Customer controller.
  * @Route("/api", name="api_")
  */
-class CustomerController extends FOSRestController
+class CustomerController extends AbstractController
 {
     /**
-     * Lists all Customers.
-     * @Rest\Get("/customers")
-     *
-     * @return Response
+     * @Route("/customer", name="customer_list", methods={"GET"})
      */
-    public function getCustomerAction()
+    public function list(CustomerRepository $customerRepository): JsonResponse
     {
-        $repository = $this->getDoctrine()->getRepository(Customer::class);
-        $customers = $repository->findBy(array('deleted' => false));
+        $customers = $customerRepository->findBy(array('deleted' => false));
 
-        return $this->handleView($this->view($customers));
+        return new JsonResponse($customers);
     }
 
     /**
-     * Create Customer.
-     * @Rest\Post("/customer")
-     *
-     * @return Response
+     * @Route("/customer", name="customer_create", methods={"POST"})
      */
-    public function postCustomerAction(Request $request)
+    public function create(Request $request): JsonResponse
     {
         $customer = new Customer();
+
         $form = $this->createForm(CustomerType::class, $customer);
         $data = json_decode($request->getContent(), true);
         $form->submit($data);
@@ -47,31 +42,25 @@ class CustomerController extends FOSRestController
             $user = $this->getUser();
             $customer->setCreator($user);
 
-            $em = $this->getDoctrine()->getManager();
-            $em->persist($customer);
-            $em->flush();
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($customer);
+            $entityManager->flush();
 
-            return $this->handleView($this->view(['success' => true], Response::HTTP_CREATED));
+            return new JsonResponse(['success' => true], Response::HTTP_CREATED);
         }
 
-        return $this->handleView($this->view($form->getErrors()));
+        return new JsonResponse(['success' => false, 'errors' => $form->getErrors()], Response::HTTP_OK);
     }
 
     /**
-     * Update Customer.
-     * @Rest\Put("/customer/{id}")
-     *
-     * @return Response
+     * @Route("/customer/{id}", name="customer_update", methods={"PUT"})
      */
-    public function putCustomerAction(Request $request, $id)
+    public function update(Request $request, $id, CustomerRepository $customerRepository): JsonResponse
     {
-        $customerRepo = $this->getDoctrine()
-            ->getRepository(Customer::class);
+        $customer = $customerRepository->find($id);
 
-        $customer = $customerRepo->find($id);
-
-        if (!$customer) {
-            return $this->handleView($this->view(['success' => false, 'msg' => 'No customer found for id '. $id]));
+        if (!$this->isValidCustomer($customer)) {
+            return new JsonResponse(['success' => false, 'msg' => 'No customer found for id '. $id]);
         }
 
         $form = $this->createForm(CustomerType::class, $customer);
@@ -85,27 +74,21 @@ class CustomerController extends FOSRestController
             $em = $this->getDoctrine()->getManager();
             $em->flush();
 
-            return $this->handleView($this->view(['success' => true], Response::HTTP_OK));
+            return new JsonResponse(['success' => true], Response::HTTP_OK);
         }
 
-        return $this->handleView($this->view($form->getErrors()));
+        return new JsonResponse(['success' => false, 'errors' => $form->getErrors()], Response::HTTP_OK);
     }
 
     /**
-     * Delete Customer.
-     * @Rest\Delete("/customer/{id}")
-     *
-     * @return Response
+     * @Route("/{id}", name="customer_delete", methods={"DELETE"})
      */
-    public function deleteCustomerAction(Request $request, $id)
+    public function delete(Request $request, $id, CustomerRepository $customerRepository): JsonResponse
     {
-        $customerRepo = $this->getDoctrine()
-            ->getRepository(Customer::class);
+        $customer = $customerRepository->find($id);
 
-        $customer = $customerRepo->find($id);
-
-        if (!$customer) {
-            return $this->handleView($this->view(['success' => false, 'msg' => 'No customer found for id '. $id]));
+        if (!$this->isValidCustomer($customer)) {
+            return new JsonResponse(['success' => false, 'msg' => 'No customer found for id '. $id]);
         }
 
         $user = $this->getUser();
@@ -116,5 +99,10 @@ class CustomerController extends FOSRestController
         $em->flush();
 
         return $this->handleView($this->view(['success' => true], Response::HTTP_OK));
+    }
+
+    private function isValidCustomer($customer): ?bool
+    {
+        return ($customer instanceof Customer) && !$customer->getDeleted();
     }
 }
