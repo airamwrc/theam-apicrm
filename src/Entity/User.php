@@ -34,6 +34,45 @@ class User extends BaseUser implements \JsonSerializable
      */
     private $deleted = 0;
 
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $name;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $surname;
+
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getSurname(): ?string
+    {
+        return $this->surname;
+    }
+
+    public function setSurname(?string $surname): self
+    {
+        $this->surname = $surname;
+
+        return $this;
+    }
+
     public function getCreated(): ?\DateTimeInterface
     {
         return $this->created;
@@ -87,17 +126,14 @@ class User extends BaseUser implements \JsonSerializable
         return $this;
     }
 
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function jsonSerialize(): array
     {
         return [
             'id'            => $this->id,
             'username'      => $this->username,
             'email'         => $this->email,
+            'name'          => $this->name,
+            'surname'       => $this->surname,
             'created'       => $this->created->format('Y-m-d H:i:s'),
             'updated'       => $this->updated->format('Y-m-d H:i:s'),
         ];

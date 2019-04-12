@@ -80,6 +80,46 @@ class Customer implements \JsonSerializable
      */
     private $deleted = 0;
 
+    /**
+     * @ORM\Column(type="string", length=20, nullable=true)
+     */
+    private $identificationNumber;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $address;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $businessName;
+
+    /**
+     * @ORM\Column(type="string", length=22, nullable=true)
+     */
+    private $phone;
+
+    /**
+     * @ORM\Column(type="string", length=22, nullable=true)
+     */
+    private $phone2;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $contactName;
+
+    /**
+     * @ORM\Column(type="string", length=255, nullable=true)
+     */
+    private $tradeName;
+
+    /**
+     * @ORM\Column(type="text", nullable=true)
+     */
+    private $notes;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -210,16 +250,120 @@ class Customer implements \JsonSerializable
         return $this;
     }
 
+    public function getIdentificationNumber(): ?string
+    {
+        return $this->identificationNumber;
+    }
+
+    public function setIdentificationNumber(?string $identificationNumber): self
+    {
+        $this->identificationNumber = $identificationNumber;
+
+        return $this;
+    }
+
+    public function getAddress(): ?string
+    {
+        return $this->address;
+    }
+
+    public function setAddress(?string $address): self
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    public function getBusinessName(): ?string
+    {
+        return $this->businessName;
+    }
+
+    public function setBusinessName(?string $businessName): self
+    {
+        $this->businessName = $businessName;
+
+        return $this;
+    }
+
+    public function getPhone(): ?string
+    {
+        return $this->phone;
+    }
+
+    public function setPhone(?string $phone): self
+    {
+        $this->phone = $phone;
+
+        return $this;
+    }
+
+    public function getPhone2(): ?string
+    {
+        return $this->phone2;
+    }
+
+    public function setPhone2(?string $phone2): self
+    {
+        $this->phone2 = $phone2;
+
+        return $this;
+    }
+
+    public function getContactName(): ?string
+    {
+        return $this->contactName;
+    }
+
+    public function setContactName(?string $contactName): self
+    {
+        $this->contactName = $contactName;
+
+        return $this;
+    }
+
+    public function getTradeName(): ?string
+    {
+        return $this->tradeName;
+    }
+
+    public function setTradeName(?string $tradeName): self
+    {
+        $this->tradeName = $tradeName;
+
+        return $this;
+    }
+
+    public function getNotes(): ?string
+    {
+        return $this->notes;
+    }
+
+    public function setNotes(?string $notes): self
+    {
+        $this->notes = $notes;
+
+        return $this;
+    }
+
     public function jsonSerialize(): array
     {
         $defaultSerializableData = [
-            'id'            => $this->id,
-            'name'          => $this->name,
-            'surname'       => $this->surname,
-            'creator'       => $this->creator,
-            'lastEditor'    => $this->lastEditor,
-            'created'       => $this->created->format('Y-m-d H:i:s'),
-            'updated'       => $this->updated->format('Y-m-d H:i:s'),
+            'id'                    => $this->id,
+            'name'                  => $this->name,
+            'surname'               => $this->surname,
+            'identificationNumber'  => $this->identificationNumber,
+            'address'               => $this->address,
+            'businessName'          => $this->businessName,
+            'tradeName'             => $this->tradeName,
+            'contactName'           => $this->contactName,
+            'phone'                 => $this->phone,
+            'phone2'                => $this->phone2,
+            'notes'                 => $this->notes,
+            'creator'               => $this->creator,
+            'lastEditor'            => $this->lastEditor,
+            'created'               => $this->created->format('Y-m-d H:i:s'),
+            'updated'               => $this->updated->format('Y-m-d H:i:s'),
         ];
 
         $serializableData = array_merge($defaultSerializableData, $this->serializableData);
