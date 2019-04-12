@@ -7,6 +7,8 @@ parameters:
     locale: 'en'
     uploads_directory: '%kernel.project_dir%/public/uploads/'
     customer_photos_uploads_directory: '%uploads_directory%customer/photos/'
+    apiVersionsAvailable: '(1)'
+    latestStableApiVersion: '1'
 
 services:
     # default configuration for services in *this* file
@@ -39,3 +41,7 @@ services:
     App\Service\CustomerPhotoManager:
         arguments:
             $targetDirectory: '%customer_photos_uploads_directory%'
+
+    App\Service\CustomerService:
+        arguments:
+            $latestStableApiVersion: '%latestStableApiVersion%'

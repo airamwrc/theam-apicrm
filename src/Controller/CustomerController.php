@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 /**
- * @Route("/api", name="api_")
+ * @Route("/api/v{version}", name="api_", requirements={"version"="%apiVersionsAvailable%"})
  */
 class CustomerController extends AbstractController
 {
