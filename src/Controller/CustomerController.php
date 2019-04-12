@@ -7,6 +7,7 @@ use App\Form\CustomerType;
 use App\Form\CustomerPhotoType;
 use App\Repository\CustomerRepository;
 use App\Service\CustomerPhotoManager;
+use App\Service\CustomerService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,9 +23,10 @@ class CustomerController extends AbstractController
     /**
      * @Route("/customer", name="customer_list", methods={"GET"})
      */
-    public function list(CustomerRepository $customerRepository): JsonResponse
+    public function list(CustomerRepository $customerRepository, CustomerService $customerService): JsonResponse
     {
         $customers = $customerRepository->findBy(array('deleted' => false));
+        $customerService->completeSerializableData($customers);
 
         return new JsonResponse($customers);
     }

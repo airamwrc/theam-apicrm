@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\File\File;
  */
 class Customer implements \JsonSerializable
 {
+    private $serializableData = [];
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
@@ -210,7 +212,7 @@ class Customer implements \JsonSerializable
 
     public function jsonSerialize(): array
     {
-        return [
+        $defaultSerializableData = [
             'id'            => $this->id,
             'name'          => $this->name,
             'surname'       => $this->surname,
@@ -219,5 +221,14 @@ class Customer implements \JsonSerializable
             'created'       => $this->created->format('Y-m-d H:i:s'),
             'updated'       => $this->updated->format('Y-m-d H:i:s'),
         ];
+
+        $serializableData = array_merge($defaultSerializableData, $this->serializableData);
+
+        return $serializableData;
+    }
+
+    public function addSerializableData($newSerializableData): void
+    {
+        $this->serializableData = array_merge($this->serializableData, $newSerializableData);
     }
 }
