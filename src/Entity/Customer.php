@@ -8,7 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
  * @ORM\Entity(repositoryClass="App\Repository\CustomerRepository")
  * @ORM\HasLifecycleCallbacks()
  */
-class Customer
+class Customer implements \JsonSerializable
 {
     /**
      * @ORM\Id()
@@ -175,5 +175,16 @@ class Customer
         $this->deleted = $deleted;
 
         return $this;
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'id'            => $this->id,
+            'name'          => $this->name,
+            'surname'       => $this->surname,
+            'creator'       => $this->creator,
+            'lastEditor'    => $this->lastEditor,
+        ];
     }
 }
