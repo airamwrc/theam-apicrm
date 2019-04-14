@@ -16,7 +16,7 @@ class FileManager
 
     public function upload(UploadedFile $file)
     {
-        $fileName = md5(uniqid()).'.'.$file->guessExtension();
+        $fileName = $this->getNewFilename($file);
 
         try {
             $file->move($this->getTargetDirectory(), $fileName);
@@ -45,5 +45,17 @@ class FileManager
     public function getTargetDirectory()
     {
         return $this->targetDirectory;
+    }
+
+    protected function getNewFilename($file)
+    {
+        // Probability to match the same name is 1 in a 4.7890486e+52
+        do {
+            $filename = md5(uniqid('', true)) . '.' . $file->guessExtension();
+            $filePath = $this->getTargetDirectory() . $filename;
+            $fileExists = file_exists($filePath);
+        } while ($fileExists);
+
+        return $filename;
     }
 }
