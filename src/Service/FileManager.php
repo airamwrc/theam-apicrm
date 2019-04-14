@@ -47,6 +47,41 @@ class FileManager
         return $this->targetDirectory;
     }
 
+    public function getFileContents($filename)
+    {
+        if (!$this->isFile($filename)) {
+            return null;
+        }
+
+        $absoluteFilename = $this->getAbsoluteFilename($filename);
+
+        return file_get_contents($absoluteFilename);
+    }
+
+    public function getMimeType($filename)
+    {
+        if (!$this->isFile($filename)) {
+            return null;
+        }
+
+        $absoluteFilename = $this->getAbsoluteFilename($filename);
+        $mimeType = image_type_to_mime_type(exif_imagetype($absoluteFilename));
+
+        return $mimeType;
+    }
+
+    public function isFile($filename)
+    {
+        $absoluteFilename = $this->getAbsoluteFilename($filename);
+        return is_file($absoluteFilename);
+    }
+
+    public function getAbsoluteFilename($filename)
+    {
+        $imagePath = $this->getTargetDirectory();
+        return $imagePath . $filename;
+    }
+
     protected function getNewFilename($file)
     {
         // Probability to match the same name is 1 in a 4.7890486e+52

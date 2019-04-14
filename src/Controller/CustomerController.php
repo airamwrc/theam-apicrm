@@ -89,6 +89,27 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * @Route("/customer/photo/{id}", name="customer_get_photo", methods={"GET"})
+     */
+    public function getPhoto(Request $request, $id, CustomerRepository $customerRepository, CustomerPhotoManager $fileManager): Response
+    {
+        $customer = $customerRepository->find($id);
+
+        if (!$this->isValidCustomer($customer)) {
+            return $this->createCustomerNotFoundResponse();
+        }
+
+        $photoName = $customer->getPhoto();
+        $fileContent = $fileManager->getFileContents($photoName);
+        $mimeType = $fileManager->getMimeType($photoName);
+
+        $response = new Response($fileContent);
+        $response->headers->set('Content-Type', $mimeType);
+
+        return $response;
+    }
+
+    /**
      * @Route("/customer/{id}", name="customer_update", methods={"PUT"})
      */
     public function update(Request $request, $id, CustomerRepository $customerRepository): JsonResponse
