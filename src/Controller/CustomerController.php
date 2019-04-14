@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Customer;
 use App\Form\CustomerType;
+use App\Form\CustomerPhotoType;
 use App\Repository\CustomerRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
@@ -11,6 +12,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Service\FileUploader;
 
 /**
  * @Route("/api", name="api_")
@@ -41,6 +43,41 @@ class CustomerController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
             $customer->setCreator($user);
+            $customer->setLastEditor($user);
+
+            $entityManager = $this->getDoctrine()->getManager();
+            $entityManager->persist($customer);
+            $entityManager->flush();
+
+            return new JsonResponse(['success' => true, 'customerId' => $customer->getId()], Response::HTTP_CREATED);
+        }
+
+        $formErrors = $form->getErrors(true)->__toString();
+        return new JsonResponse(['success' => false, 'errors' => $formErrors], Response::HTTP_OK);
+    }
+
+    /**
+     * @Route("/customer/photo/{id}", name="customer_upload_photo", methods={"POST"})
+     */
+    public function uploadPhoto(Request $request, $id, CustomerRepository $customerRepository, FileUploader $fileUploader): JsonResponse
+    {
+        $customer = $customerRepository->find($id);
+
+        if (!$this->isValidCustomer($customer)) {
+            return new JsonResponse(['success' => false, 'msg' => 'No customer found for id '. $id]);
+        }
+
+        $form = $this->createForm(CustomerPhotoType::class, $customer);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $user = $this->getUser();
+            $customer->setLastEditor($user);
+
+            $file = $customer->getImageFile();
+            $fileName = $fileUploader->upload($file);
+
+            $customer->setPhoto($fileName);
 
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->persist($customer);
@@ -49,7 +86,8 @@ class CustomerController extends AbstractController
             return new JsonResponse(['success' => true], Response::HTTP_CREATED);
         }
 
-        return new JsonResponse(['success' => false, 'errors' => $form->getErrors()], Response::HTTP_OK);
+        $formErrors = $form->getErrors(true)->__toString();
+        return new JsonResponse(['success' => false, 'errors' => $formErrors], Response::HTTP_OK);
     }
 
     /**
@@ -77,11 +115,12 @@ class CustomerController extends AbstractController
             return new JsonResponse(['success' => true], Response::HTTP_OK);
         }
 
-        return new JsonResponse(['success' => false, 'errors' => $form->getErrors()], Response::HTTP_OK);
+        $formErrors = $form->getErrors(true)->__toString();
+        return new JsonResponse(['success' => false, 'errors' => $formErrors], Response::HTTP_OK);
     }
 
     /**
-     * @Route("/{id}", name="customer_delete", methods={"DELETE"})
+     * @Route("/customer/{id}", name="customer_delete", methods={"DELETE"})
      */
     public function delete(Request $request, $id, CustomerRepository $customerRepository): JsonResponse
     {
@@ -98,7 +137,7 @@ class CustomerController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $em->flush();
 
-        return $this->handleView($this->view(['success' => true], Response::HTTP_OK));
+        return new JsonResponse(['success' => true], Response::HTTP_OK);
     }
 
     private function isValidCustomer($customer): ?bool

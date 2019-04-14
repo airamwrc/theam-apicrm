@@ -22,7 +22,7 @@ final class Version20190410214918 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
-        $this->addSql('ALTER TABLE customer ADD creator_id INT NOT NULL, ADD last_editor_id INT DEFAULT NULL, CHANGE created created DATETIME NOT NULL, CHANGE updated updated DATETIME NOT NULL');
+        $this->addSql('ALTER TABLE customer ADD creator_id INT NOT NULL, ADD last_editor_id INT NOT NULL, CHANGE created created DATETIME NOT NULL, CHANGE updated updated DATETIME NOT NULL');
         $this->addSql('ALTER TABLE customer ADD CONSTRAINT FK_81398E0961220EA6 FOREIGN KEY (creator_id) REFERENCES fos_user (id)');
         $this->addSql('ALTER TABLE customer ADD CONSTRAINT FK_81398E097E5A734A FOREIGN KEY (last_editor_id) REFERENCES fos_user (id)');
         $this->addSql('CREATE INDEX IDX_81398E0961220EA6 ON customer (creator_id)');

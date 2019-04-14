@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\HttpFoundation\File\File;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CustomerRepository")
@@ -19,11 +21,15 @@ class Customer implements \JsonSerializable
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
+     * @Assert\NotBlank(message="name could not be blank.")
      */
     private $name;
 
     /**
      * @ORM\Column(type="string", length=255)
+     *
+     * @Assert\NotBlank(message="surname could not be blank.")
      */
     private $surname;
 
@@ -33,6 +39,19 @@ class Customer implements \JsonSerializable
     private $photo;
 
     /**
+     * NOTE: This is not a mapped field of entity metadata, just a simple property.
+     *
+     * @Assert\File(
+     *      mimeTypes = { "image/jpeg", "image/png" },
+     *      mimeTypesMessage = "Not valid image file. Allowed types are jpg and png",
+     *      maxSize = "5M"
+     * )
+     *
+     * @var File
+     */
+    private $imageFile;
+
+    /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
      * @ORM\JoinColumn(name="creator_id", referencedColumnName="id", nullable=false)
      */
@@ -40,7 +59,7 @@ class Customer implements \JsonSerializable
 
     /**
      * @ORM\ManyToOne(targetEntity="App\Entity\User")
-     * @ORM\JoinColumn(name="last_editor_id", referencedColumnName="id", nullable=true)
+     * @ORM\JoinColumn(name="last_editor_id", referencedColumnName="id", nullable=false)
      */
     private $lastEditor;
 
@@ -100,6 +119,18 @@ class Customer implements \JsonSerializable
         return $this;
     }
 
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageFile(File $imageFile): self
+    {
+        $this->imageFile = $imageFile;
+
+        return $this;
+    }
+
     public function setCreator(User $creator): self
     {
         $this->creator = $creator;
@@ -112,7 +143,7 @@ class Customer implements \JsonSerializable
         return $this->creator;
     }
 
-    public function setLastEditor(User $lastEditor = null): self
+    public function setLastEditor(User $lastEditor): self
     {
         $this->lastEditor = $lastEditor;
 
