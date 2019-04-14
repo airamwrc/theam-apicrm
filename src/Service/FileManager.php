@@ -5,9 +5,9 @@ namespace App\Service;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class FileUploader
+class FileManager
 {
-    private $targetDirectory;
+    protected $targetDirectory;
 
     public function __construct($targetDirectory)
     {
@@ -25,6 +25,21 @@ class FileUploader
         }
 
         return $fileName;
+    }
+
+    public function remove($fileName) {
+        $filePath = $this->getTargetDirectory() . $fileName;
+
+        try {
+            if (file_exists($filePath)) {
+                unlink($filePath);
+                return true;
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+
+        return false;
     }
 
     public function getTargetDirectory()

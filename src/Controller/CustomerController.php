@@ -6,13 +6,14 @@ use App\Entity\Customer;
 use App\Form\CustomerType;
 use App\Form\CustomerPhotoType;
 use App\Repository\CustomerRepository;
+use App\Service\CustomerPhotoManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\FileUploader;
+use App\Service\FileManager;
 
 /**
  * @Route("/api", name="api_")
@@ -59,7 +60,7 @@ class CustomerController extends AbstractController
     /**
      * @Route("/customer/photo/{id}", name="customer_upload_photo", methods={"POST"})
      */
-    public function uploadPhoto(Request $request, $id, CustomerRepository $customerRepository, FileUploader $fileUploader): JsonResponse
+    public function uploadPhoto(Request $request, $id, CustomerRepository $customerRepository, CustomerPhotoManager $fileManager): JsonResponse
     {
         $customer = $customerRepository->find($id);
 
@@ -75,7 +76,7 @@ class CustomerController extends AbstractController
             $customer->setLastEditor($user);
 
             $file = $customer->getImageFile();
-            $fileName = $fileUploader->upload($file);
+            $fileName = $fileManager->uploadAndRemoveOld($file, $customer);
 
             $customer->setPhoto($fileName);
 
