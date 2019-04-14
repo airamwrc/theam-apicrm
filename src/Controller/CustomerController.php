@@ -13,7 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Service\FileManager;
 
 /**
  * @Route("/api", name="api_")
@@ -53,8 +52,7 @@ class CustomerController extends AbstractController
             return new JsonResponse(['success' => true, 'customerId' => $customer->getId()], Response::HTTP_CREATED);
         }
 
-        $formErrors = $form->getErrors(true)->__toString();
-        return new JsonResponse(['success' => false, 'errors' => $formErrors], Response::HTTP_OK);
+        return $this->createResponseWithFormErrors($form);
     }
 
     /**
@@ -65,7 +63,7 @@ class CustomerController extends AbstractController
         $customer = $customerRepository->find($id);
 
         if (!$this->isValidCustomer($customer)) {
-            return new JsonResponse(['success' => false, 'msg' => 'No customer found for id '. $id]);
+            return $this->createCustomerNotFoundResponse();
         }
 
         $form = $this->createForm(CustomerPhotoType::class, $customer);
@@ -87,8 +85,7 @@ class CustomerController extends AbstractController
             return new JsonResponse(['success' => true], Response::HTTP_CREATED);
         }
 
-        $formErrors = $form->getErrors(true)->__toString();
-        return new JsonResponse(['success' => false, 'errors' => $formErrors], Response::HTTP_OK);
+        return $this->createResponseWithFormErrors($form);
     }
 
     /**
@@ -99,7 +96,7 @@ class CustomerController extends AbstractController
         $customer = $customerRepository->find($id);
 
         if (!$this->isValidCustomer($customer)) {
-            return new JsonResponse(['success' => false, 'msg' => 'No customer found for id '. $id]);
+            return $this->createCustomerNotFoundResponse();
         }
 
         $form = $this->createForm(CustomerType::class, $customer);
@@ -116,8 +113,7 @@ class CustomerController extends AbstractController
             return new JsonResponse(['success' => true], Response::HTTP_OK);
         }
 
-        $formErrors = $form->getErrors(true)->__toString();
-        return new JsonResponse(['success' => false, 'errors' => $formErrors], Response::HTTP_OK);
+        return $this->createResponseWithFormErrors($form);
     }
 
     /**
@@ -128,7 +124,7 @@ class CustomerController extends AbstractController
         $customer = $customerRepository->find($id);
 
         if (!$this->isValidCustomer($customer)) {
-            return new JsonResponse(['success' => false, 'msg' => 'No customer found for id '. $id]);
+            return $this->createCustomerNotFoundResponse();
         }
 
         $user = $this->getUser();
@@ -144,5 +140,16 @@ class CustomerController extends AbstractController
     private function isValidCustomer($customer): ?bool
     {
         return ($customer instanceof Customer) && !$customer->getDeleted();
+    }
+
+    private function createCustomerNotFoundResponse(): JsonResponse
+    {
+        return new JsonResponse(['success' => false, 'msg' => 'Customer not found'], Response::HTTP_NOT_FOUND);
+    }
+
+    private function createResponseWithFormErrors($form): JsonResponse
+    {
+        $formErrors = $form->getErrors(true)->__toString();
+        return new JsonResponse(['success' => false, 'errors' => $formErrors], Response::HTTP_OK);
     }
 }

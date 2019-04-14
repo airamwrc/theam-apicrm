@@ -14,7 +14,6 @@ class CustomerType extends AbstractType
         $builder
             ->add('name')
             ->add('surname')
-            ->add('photo')
         ;
     }
 
