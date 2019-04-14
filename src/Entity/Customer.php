@@ -216,6 +216,8 @@ class Customer implements \JsonSerializable
             'surname'       => $this->surname,
             'creator'       => $this->creator,
             'lastEditor'    => $this->lastEditor,
+            'created'       => $this->created->format('Y-m-d H:i:s'),
+            'updated'       => $this->updated->format('Y-m-d H:i:s'),
         ];
     }
 }
