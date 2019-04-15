@@ -36,7 +36,7 @@ sed -i "s/display_errors = .*/display_errors = On/" /etc/php/7.1/apache2/php.ini
 sudo a2enmod rewrite
 
 echo "-- Creating virtual hosts --"
-sudo ln -fs /vagrant/public/ /var/www/apicrm
+sudo ln -fs /vagrant/ /var/www/apicrm
 cat << EOF | sudo tee -a /etc/apache2/sites-available/default.conf
 <Directory "/var/www/">
     AllowOverride All
@@ -63,4 +63,5 @@ mysql -uroot -proot -e "CREATE DATABASE apicrm";
 mysql -uroot -proot -e "CREATE USER 'apicrmuser'@'localhost' IDENTIFIED BY 'acu678';";
 mysql -uroot -proot -e "GRANT ALL PRIVILEGES ON * . * TO 'apicrmuser'@'localhost';";
 
+cp /var/www/apicrm/.env.dist /var/www/apicrm/.env
 
