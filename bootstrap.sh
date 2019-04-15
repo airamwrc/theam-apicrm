@@ -43,7 +43,7 @@ cat << EOF | sudo tee -a /etc/apache2/sites-available/default.conf
 </Directory>
 
 <VirtualHost *:80>
-    DocumentRoot /var/www/apicrm
+    DocumentRoot /var/www/apicrm/public
     ServerName apicrm.theam
 </VirtualHost>
 EOF
