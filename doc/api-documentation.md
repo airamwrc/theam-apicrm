@@ -1,5 +1,5 @@
 # API documentation
-In order to make a clearer documentation, we will assume we are working under the next domain
+In order to make a clearer documentation, we will assume we are working under the next domain as example and the URL's specified in the examples below are relative to this one
 
     http://apicrm.theam/
 
