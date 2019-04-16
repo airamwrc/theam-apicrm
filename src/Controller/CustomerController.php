@@ -102,6 +102,11 @@ class CustomerController extends AbstractController
         }
 
         $photoName = $customer->getPhoto();
+
+        if (!$photoName) {
+            return new JsonResponse(['success' => false, 'errors' => 'No photo found']);
+        }
+
         $fileContent = $fileManager->getFileContents($photoName);
         $mimeType = $fileManager->getMimeType($photoName);
 
@@ -167,7 +172,7 @@ class CustomerController extends AbstractController
 
     private function createCustomerNotFoundResponse(): JsonResponse
     {
-        return new JsonResponse(['success' => false, 'msg' => 'Customer not found'], Response::HTTP_NOT_FOUND);
+        return new JsonResponse(['success' => false, 'errors' => 'Customer not found'], Response::HTTP_NOT_FOUND);
     }
 
     private function createResponseWithFormErrors($form): JsonResponse

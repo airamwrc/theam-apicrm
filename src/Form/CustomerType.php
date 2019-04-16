@@ -14,6 +14,14 @@ class CustomerType extends AbstractType
         $builder
             ->add('name')
             ->add('surname')
+            ->add('identificationNumber')
+            ->add('address')
+            ->add('businessName')
+            ->add('tradeName')
+            ->add('contactName')
+            ->add('phone')
+            ->add('phone2')
+            ->add('notes')
         ;
     }
 
